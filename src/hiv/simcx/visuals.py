@@ -33,6 +33,10 @@ __docformat__ = 'restructuredtext'
 __author__ = 'Tiago Baptista'
 
 
+# Better Graphics
+mpl.style.use("ggplot")
+
+
 class Line(MplVisual):
     def __init__(self, sim: Simulator, x: list, y: list, auto_size=True,
                  **kwargs):
@@ -146,7 +150,8 @@ class FinalStateDiagram(MplVisual):
         self.ax.set_xlabel('$t={}$'.format(self.sim.time))
         if self.sim.time >= self._discard_initial:
             for i in range(len(self.sim.y)):
-                self.ax.scatter([self._seeds[i]], self.sim.y[i][-1:], c='black')
+                self.ax.scatter([self._seeds[i]],
+                                self.sim.y[i][-1:], c='black')
 
 
 class BifurcationDiagram(MplVisual):
@@ -200,4 +205,3 @@ class FractalVisual(MplVisual):
 
         self.figure.figimage(self.sim.data, cmap=kwargs.get('cmap', 'hot'),
                              norm=norm)
-
