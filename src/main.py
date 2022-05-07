@@ -1,22 +1,56 @@
 #!/usr/bin/env python3
-import numpy as np
+import simcx
+
+from hiv.models import HIVModel
+from hiv.simulators import (VirusIterator, VirusEulerSimulator,
+                            VirusHeunSimulator, VirusRK4Simulator)
+
+from hiv.visuals import VirusVisual, VirusPhaseSpace
 
 # Phase Space
 # Different Between Orbits
 # Valores Proprios Sistema (estabilidade)
 
+
+def hiv_euler():
+    hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=1, u=0.01, k=0.8)
+    sim = VirusEulerSimulator(hiv, [150.0, 150.0], [
+        100.0, 200.0], 100.0, step=0.01)
+    vis = VirusVisual(sim)
+    display = simcx.Display()
+    display.add_simulator(sim)
+    display.add_visual(vis)
+    simcx.run()
+
+
+def hiv_heun():
+    hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=1, u=0.01, k=0.8)
+    sim = VirusHeunSimulator(hiv, [150.0, 150.0], [
+        100.0, 200.0], 100.0, step=0.01)
+    vis = VirusVisual(sim)
+    display = simcx.Display()
+    display.add_simulator(sim)
+    display.add_visual(vis)
+    simcx.run()
+
+
+def hiv_rk4():
+    hiv = HIVModel(r=0.3, p=0.2, q=0.2, b=0.2, c=0.4, u=0.02, k=0.8)
+    sim = VirusRK4Simulator(hiv, [1000.0, 150.0], [
+        80.0, 30.0], 0.0, step=0.01)
+    vis = VirusVisual(sim)
+    display = simcx.Display()
+    display.add_simulator(sim)
+    display.add_visual(vis)
+    simcx.run()
+
+
 if __name__ == "__main__":
-    # Dt = 0.01
-    # fn = make_functs(0.5, 0.5, 0.2, 0.2, 1, 0.01, 0.8)
-    # sim = EulerSimulator(fn, y0, z0, x0, Dt)
-    # sim.step()
-    # sim.step()
-    # print(sim.x)
-    # hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=1, u=0.01, k=0.8)
-    # sim = ImprovedEulerSimulator(hiv, [20.0, 22.0], [
-    #                              2.0, 4.0], 1.0, step=0.01)
-    # vis = ImprovedEulerVisual(sim)
-    # display = simcx.Display()
-    # display.add_simulator(sim)
-    # display.add_visual(vis)
-    # simcx.run()
+    # hiv_rk4()
+    hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=0.2, u=0.2, k=0.8)
+    sim = VirusIterator(hiv, [10.0], [5.0], 10.0)
+    vis = VirusPhaseSpace(sim)
+    display = simcx.Display()
+    display.add_simulator(sim)
+    display.add_visual(vis)
+    simcx.run()

@@ -21,15 +21,19 @@ A simulation framework for complex systems modelling and analysis.
 """
 
 from __future__ import division
+import os
+import pyglet
+from matplotlib import animation
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt
+
 from .__version__ import __version__
 
 import matplotlib as mpl
 mpl.use('Agg')
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib import animation
-import pyglet
-import os
+# Better Graphics
+mpl.style.use("ggplot")
+
 
 try:
     from io import BytesIO as StringIO
@@ -329,8 +333,5 @@ class FFMpegWriter(animation.FFMpegWriter):
 def run():
     pyglet.app.run()
 
+
 # import sub-modules
-from . import simulators
-from . import visuals
-
-

@@ -1,3 +1,2 @@
-from .simcx import *
-from .models import *
-from .simulators import *
+from . import models
+from . import simulators

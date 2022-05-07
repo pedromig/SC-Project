@@ -1,14 +1,13 @@
 import simcx
 import numpy as np
 
-from models import HIVModel, GenericVirusModel
-
-from simcx.simulators import Simulator
-from simcx.visuals import MplVisual
+from .models import GenericVirusModel
 
 
-class VirusSimulator(Simulator):
-    def __init__(self, model: GenericVirusModel, x, v, z, step=0.1, start=0.0):
+class VirusSimulator(simcx.Simulator):
+    def __init__(self: object, model: GenericVirusModel,
+                 x: list[float], v: list[float], z: list[float],
+                 step: float = 0.1, start: float = 0.0) -> None:
         super(VirusSimulator, self).__init__()
         self._model = model
         self._step = step
@@ -17,8 +16,30 @@ class VirusSimulator(Simulator):
         self._mutants = len(self._x[0])
 
 
-class VirusEulerSimulator(VirusSimulator):
+class VirusIterator(VirusSimulator):
     def step(self, delta=0):
+        x, v = np.array([0.] * self._mutants), np.array([0.] * self._mutants)
+        svi = sum(self._v[-1][i] for i in range(self._mutants))
+        for i in range(self._mutants):
+            x[i] = self._model.x(self._x[-1][i],
+                                 self._v[-1][i],
+                                 self._z[-1], svi)
+
+            v[i] = self._model.v(self._x[-1][i],
+                                 self._v[-1][i],
+                                 self._z[-1])
+
+        z = self._model.z(0, 0, self._z[-1], svi)
+        t = self._t[-1] + self._step
+
+        self._x = np.concatenate((self._x, [x]), axis=0)
+        self._v = np.concatenate((self._v, [v]), axis=0)
+        self._z = np.concatenate((self._z, [z]), axis=0)
+        self._t = np.concatenate((self._t, [t]), axis=0)
+
+
+class VirusEulerSimulator(VirusSimulator):
+    def step(self: object, delta: float = 0.0) -> None:
         x, v = np.array([0.] * self._mutants), np.array([0.] * self._mutants)
         svi = sum(self._v[-1][i] for i in range(self._mutants))
 
@@ -44,7 +65,7 @@ class VirusEulerSimulator(VirusSimulator):
 
 
 class VirusHeunSimulator(VirusSimulator):
-    def step(self, delta=0):
+    def step(self: object, delta: float = 0.0) -> None:
         k1x, k1v = np.array(
             [0.] * self._mutants), np.array([0.] * self._mutants)
 
@@ -91,7 +112,7 @@ class VirusHeunSimulator(VirusSimulator):
 
 
 class VirusRK4Simulator(VirusSimulator):
-    def step(self, delta=0):
+    def step(self: object, delta: float = 0) -> None:
         # K1 Calculation
         k1x, k1v = np.array(
             [0.] * self._mutants), np.array([0.] * self._mutants)
@@ -173,56 +194,3 @@ class VirusRK4Simulator(VirusSimulator):
         self._v = np.concatenate((self._v, [v]), axis=0)
         self._z = np.concatenate((self._z, [z]), axis=0)
         self._t = np.concatenate((self._t, [t]), axis=0)
-
-
-class VirusVisual(MplVisual):
-    def __init__(self, sim: GenericVirusModel, title=None):
-        super(VirusVisual, self).__init__(sim, width=1000, height=800)
-
-        self.x, self.v = [], []
-        self.plots = self.sim._mutants + 1
-        self.ax = [
-            self.figure.add_subplot(self.plots, 1, i + 1)
-            for i in range(self.plots)]
-
-        self.figure.suptitle(
-            sim._model.__class__.__name__ if title is None else title,
-            size=18)
-
-        for i in range(self.sim._mutants):
-            self.ax[i].set_title(f"Virus Mutant {i}")
-            x, = self.ax[i].plot(self.sim._t, self.sim._v[:, i],
-                                 "-",  label="Virus")
-            v, = self.ax[i].plot(self.sim._t, self.sim._x[:, i],
-                                 "-", label="Immune system response")
-            self.x.append(x)
-            self.v.append(v)
-            self.ax[i].legend()
-
-        self.ax[-1].set_title("Global immune system response")
-        self.z, = self.ax[-1].plot(self.sim._t, self.sim._z,
-                                   "-", label="Global immune system response")
-        self.ax[-1].legend()
-
-    def draw(self):
-        for i in range(self.sim._mutants):
-            self.x[i].set_data(self.sim._t, self.sim._x[:, i])
-            self.v[i].set_data(self.sim._t, self.sim._v[:, i])
-            self.ax[i].relim()
-            self.ax[i].autoscale_view()
-        self.z.set_data(self.sim._t, self.sim._z)
-        self.ax[-1].relim()
-        self.ax[-1].autoscale_view()
-
-
-if __name__ == "__main__":
-
-    hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=1, u=0.01, k=0.8)
-    sim = VirusRK4Simulator(hiv, [150.0, 150.0], [
-        100.0, 200.0], 100.0, step=0.01)
-    vis = VirusVisual(sim)
-    display = simcx.Display()
-    display.add_simulator(sim)
-    display.add_visual(vis)
-
-    simcx.run()
