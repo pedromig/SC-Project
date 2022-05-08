@@ -3,6 +3,8 @@ import simcx
 from .models import GenericVirusModel
 from .simulators import VirusIterator
 
+from mpl_toolkits.mplot3d import Axes3D
+
 
 class VirusVisual(simcx.MplVisual):
     def __init__(self: object,
@@ -68,6 +70,5 @@ class VirusPhaseSpace(simcx.MplVisual):
         for i in range(self.sim._mutants):
             self.lines[i].set_data_3d(
                 self.sim._x[:, i], self.sim._v[:, i], self.sim._z)
-            print(self.lines[i])
             self.ax[i].relim()
             self.ax[i].autoscale_view()

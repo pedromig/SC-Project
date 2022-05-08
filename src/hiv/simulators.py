@@ -26,16 +26,21 @@ class VirusIterator(VirusSimulator):
     def step(self, delta=0):
         x, v = np.array([0.] * self._mutants), np.array([0.] * self._mutants)
         svi = sum(self._v[-1][i] for i in range(self._mutants))
+
         for i in range(self._mutants):
-            x[i] = self._model.x(self._x[-1][i],
-                                 self._v[-1][i],
-                                 self._z[-1], svi)
+            x[i] = self._x[-1][i] + self._model.x(self._x[-1][i],
+                                                  self._v[-1][i],
+                                                  self._z[-1], svi)
+            x[i] = 0.0 if x[i] < 0 else x[i]
 
-            v[i] = self._model.v(self._x[-1][i],
-                                 self._v[-1][i],
-                                 self._z[-1])
+            v[i] = self._v[-1][i] + self._model.v(self._x[-1][i],
+                                                  self._v[-1][i],
+                                                  self._z[-1])
+            v[i] = 0.0 if v[i] < 0 else v[i]
 
-        z = self._model.z(0, 0, self._z[-1], svi)
+        z = self._z[-1] + self._model.z(0, 0, self._z[-1], svi)
+        z = 0.0 if z < 0 else z
+
         t = self._t[-1] + self._step
 
         self._x = np.concatenate((self._x, [x]), axis=0)
@@ -50,7 +55,6 @@ class VirusEulerSimulator(VirusSimulator):
         svi = sum(self._v[-1][i] for i in range(self._mutants))
 
         for i in range(self._mutants):
-
             x[i] = self._x[-1][i] + \
                 self._model.x(self._x[-1][i],
                               self._v[-1][i],

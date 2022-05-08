@@ -30,23 +30,49 @@ class VirusIntegrator:
 
 def phase_space(model, *args):
     sim = VirusIterator(model, *args)
-    vis = VirusPhaseSpace(sim)
+    vis = VirusVisual(sim)
     display = simcx.Display()
     display.add_simulator(sim)
     display.add_visual(vis)
     simcx.run()
 
 
+# Integration Methods
+def integration(model, *args):
+    euler = VirusIntegrator(model, VirusEulerSimulator)
+    # heun = VirusIntegrator(model, VirusHeunSimulator)
+    # rk4 = VirusIntegrator(hiv, VirusRK4Simulator)
+    euler(*args)
+
+
 if __name__ == "__main__":
+    x0 = [1.2320968490204192]
+    v0 = [2.4298860334362407]
+    z0 = 2.0218848811803576
 
-    # Models
-    hiv = HIVModel(r=0.3, p=0.1, q=0.1,
-                   c=0.8, b=0.4,  u=0.2,
-                   k=0.8)
+    chaotic = HIVModel(r=0.8976409287479137,
+                       p=0.3730231282375587,
+                       q=0.07271925334265861,
+                       c=0.966378536424239,
+                       b=-0.45482582469388344,
+                       u=0.8452628018285122,
+                       k=0.45417337083720355)
 
-    # Integration Methods
-    euler = VirusIntegrator(hiv, VirusEulerSimulator)
-    heun = VirusIntegrator(hiv, VirusHeunSimulator)
-    rk4 = VirusIntegrator(hiv, VirusRK4Simulator)
+    periodic = HIVModel(r=-0.8330282398491504,
+                        p=-0.1889978596607591,
+                        q=0.3227333626934952,
+                        c=-0.3543348404606479,
+                        b=-0.8026310615455257,
+                        u=0.4755867761890036,
+                        k=0.06319226271725653)
 
-    rk4([200.0], [20.], [100.])
+    fixed = HIVModel(k=0.7207790085804264,
+                     b=0.8566381427976779,
+                     u=0.07955290482250144,
+                     c=-0.36286047460543713,
+                     r=-0.575907636089783,
+                     p=0.09287266122633797,
+                     q=-0.15983849314778742)
+
+    # integration(chaotic, x0, v0, z0)
+    phase_space(chaotic, x0, v0, z0)

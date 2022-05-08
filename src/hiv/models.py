@@ -10,17 +10,20 @@ class GenericVirusModel:
 
     def v(self: object, *args) -> float:
         x, v, z, = args
-        return - v * (self.args["r"] -
+        vi_t = - v * (self.args["r"] -
                       (self.args["p"] * x) -
                       (self.args["q"] * z))
+        return vi_t
 
     def x(self: object, *args) -> float:
         x, v, _, _ = args
-        return - self.args["c"] * v - self.args["b"] * x
+        xi_t = - self.args["c"] * v - self.args["b"] * x
+        return xi_t
 
     def z(self: object, *args) -> float:
         _, _, z, svi = args
-        return self.args["k"] * svi - self.args["b"] * z
+        z_t = self.args["k"] * svi - self.args["b"] * z
+        return z_t
 
     @staticmethod
     def solve():
@@ -49,15 +52,17 @@ class HIVModel(GenericVirusModel):
 
     def x(self: object, *args) -> float:
         x, v, _, svi = args
-        return - self.args["c"] * v \
-               - self.args["b"] * x \
-               - self.args["u"] * svi * x
+        xi_t = - (self.args["c"] * v) \
+               - (self.args["b"] * x) \
+               - (self.args["u"] * svi * x)
+        return xi_t
 
     def z(self: object, *args) -> float:
         _, _, z, svi = args
-        return self.args["k"] * svi \
-            - self.args["b"] * z \
-            - self.args["u"] * svi * z
+        z_t = (self.args["k"] * svi) \
+            - (self.args["b"] * z) \
+            - (self.args["u"] * svi * z)
+        return z_t
 
     @staticmethod
     def solve():
