@@ -15,6 +15,12 @@ class VirusSimulator(simcx.Simulator):
         self._t = np.array([start])
         self._mutants = len(self._x[0])
 
+    def reset(self):
+        self._x = np.array([self._x[0]])
+        self._v = np.array([self._v[0]])
+        self._z = np.array([self._z[0]])
+        self._t = np.array([self._t[0]])
+
 
 class VirusIterator(VirusSimulator):
     def step(self, delta=0):

@@ -34,7 +34,7 @@ __author__ = 'Tiago Baptista'
 
 
 # Better Graphics
-mpl.style.use("ggplot")
+mpl.style.use("seaborn")
 
 
 class Line(MplVisual):

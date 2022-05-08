@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import simcx
 
-from hiv.models import HIVModel
+from hiv.models import HIVModel, GenericVirusModel
 from hiv.simulators import (VirusIterator, VirusEulerSimulator,
                             VirusHeunSimulator, VirusRK4Simulator)
 
@@ -12,33 +12,25 @@ from hiv.visuals import VirusVisual, VirusPhaseSpace
 # Valores Proprios Sistema (estabilidade)
 
 
-def hiv_euler():
-    hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=1, u=0.01, k=0.8)
-    sim = VirusEulerSimulator(hiv, [150.0, 150.0], [
-        100.0, 200.0], 100.0, step=0.01)
-    vis = VirusVisual(sim)
-    display = simcx.Display()
-    display.add_simulator(sim)
-    display.add_visual(vis)
-    simcx.run()
+class VirusIntegrator:
+    def __init__(self: object,
+                 model: GenericVirusModel,
+                 integrator=VirusRK4Simulator) -> None:
+        self._model = model
+        self._integrator = integrator
+
+    def __call__(self: object, *args, **kwargs) -> None:
+        sim = self._integrator(self._model, *args, **kwargs)
+        vis = VirusVisual(sim)
+        display = simcx.Display()
+        display.add_simulator(sim)
+        display.add_visual(vis)
+        simcx.run()
 
 
-def hiv_heun():
-    hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=1, u=0.01, k=0.8)
-    sim = VirusHeunSimulator(hiv, [150.0, 150.0], [
-        100.0, 200.0], 100.0, step=0.01)
-    vis = VirusVisual(sim)
-    display = simcx.Display()
-    display.add_simulator(sim)
-    display.add_visual(vis)
-    simcx.run()
-
-
-def hiv_rk4():
-    hiv = HIVModel(r=0.3, p=0.2, q=0.2, b=0.2, c=0.4, u=0.02, k=0.8)
-    sim = VirusRK4Simulator(hiv, [1000.0, 150.0], [
-        80.0, 30.0], 0.0, step=0.01)
-    vis = VirusVisual(sim)
+def phase_space(model, *args):
+    sim = VirusIterator(model, *args)
+    vis = VirusPhaseSpace(sim)
     display = simcx.Display()
     display.add_simulator(sim)
     display.add_visual(vis)
@@ -46,11 +38,15 @@ def hiv_rk4():
 
 
 if __name__ == "__main__":
-    # hiv_rk4()
-    hiv = HIVModel(r=0.5, p=0.5, q=0.2, b=0.2, c=0.2, u=0.2, k=0.8)
-    sim = VirusIterator(hiv, [10.0], [5.0], 10.0)
-    vis = VirusPhaseSpace(sim)
-    display = simcx.Display()
-    display.add_simulator(sim)
-    display.add_visual(vis)
-    simcx.run()
+
+    # Models
+    hiv = HIVModel(r=0.3, p=0.1, q=0.1,
+                   c=0.8, b=0.4,  u=0.2,
+                   k=0.8)
+
+    # Integration Methods
+    euler = VirusIntegrator(hiv, VirusEulerSimulator)
+    heun = VirusIntegrator(hiv, VirusHeunSimulator)
+    rk4 = VirusIntegrator(hiv, VirusRK4Simulator)
+
+    rk4([200.0], [20.], [100.])
