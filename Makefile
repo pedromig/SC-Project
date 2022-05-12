@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 ENV := venv
 PYTHON := python3
 
@@ -10,8 +11,9 @@ REQUIREMENTS := requirements.txt
 env:
 	@echo "Setting up virtual environment..."
 	@$(PYTHON) -m venv $(ENV)
-	@$(PYTHON) -m pip install --upgrade pip
-	@$(PYTHON) -m pip install -r $(REQUIREMENTS)
+	@source $(ENV)/bin/activate && \
+		$(PYTHON) -m pip install --upgrade pip && \
+		$(PYTHON) -m pip install -r $(REQUIREMENTS)
 	@cp -r $(SIMCX) $(SITE)	
 	@echo "DONE!" 
 

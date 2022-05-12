@@ -65,6 +65,9 @@ class VirusPhaseSpace(simcx.MplVisual):
             line, = self.ax[i].plot(
                 self.sim._x[:, i], self.sim._v[:, i], self.sim._z)
             self.lines.append(line)
+            self.ax[i].set_xlim(-20, 20)
+            self.ax[i].set_ylim(-20, 20)
+            self.ax[i].set_zlim(-20, 20)
 
     def draw(self: object) -> None:
         for i in range(self.sim._mutants):

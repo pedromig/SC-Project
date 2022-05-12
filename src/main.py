@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 import simcx
+import matplotlib.pyplot as plt
 
 from hiv.models import HIVModel, GenericVirusModel
 from hiv.simulators import (VirusIterator, VirusEulerSimulator,
                             VirusHeunSimulator, VirusRK4Simulator)
 
 from hiv.visuals import VirusVisual, VirusPhaseSpace
-
-# Phase Space
-# Different Between Orbits
-# Valores Proprios Sistema (estabilidade)
 
 
 class VirusIntegrator:
@@ -28,9 +25,9 @@ class VirusIntegrator:
         simcx.run()
 
 
-def phase_space(model, *args):
+def orbit(model, *args):
     sim = VirusIterator(model, *args)
-    vis = VirusVisual(sim)
+    vis = VirusPhaseSpace(sim)
     display = simcx.Display()
     display.add_simulator(sim)
     display.add_visual(vis)
@@ -38,11 +35,11 @@ def phase_space(model, *args):
 
 
 # Integration Methods
-def integration(model, *args):
-    euler = VirusIntegrator(model, VirusEulerSimulator)
-    # heun = VirusIntegrator(model, VirusHeunSimulator)
-    # rk4 = VirusIntegrator(hiv, VirusRK4Simulator)
-    euler(*args)
+def integration(model, *args, **kwargs):
+    integrator = VirusIntegrator(model, VirusEulerSimulator)
+    integrator = VirusIntegrator(model, VirusHeunSimulator)
+    integrator = VirusIntegrator(model, VirusRK4Simulator)
+    integrator(*args, **kwargs)
 
 
 if __name__ == "__main__":
@@ -74,5 +71,18 @@ if __name__ == "__main__":
                      p=0.09287266122633797,
                      q=-0.15983849314778742)
 
-    # integration(chaotic, x0, v0, z0)
-    phase_space(chaotic, x0, v0, z0)
+    x = [100.]
+    v = [10.]
+    z = 100.
+
+    test = HIVModel(k=0.01,
+                    b=0.01,
+                    u=0.01,
+                    c=0.01,
+                    r=0.8,
+                    p=0.01,
+                    q=0.01)
+
+    # integration(test, x, v, z)
+    orbit(test, x, v, z)
+    plt.savefig("hiv.pdf")

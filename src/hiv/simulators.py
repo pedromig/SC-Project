@@ -28,19 +28,15 @@ class VirusIterator(VirusSimulator):
         svi = sum(self._v[-1][i] for i in range(self._mutants))
 
         for i in range(self._mutants):
-            x[i] = self._x[-1][i] + self._model.x(self._x[-1][i],
-                                                  self._v[-1][i],
-                                                  self._z[-1], svi)
-            x[i] = 0.0 if x[i] < 0 else x[i]
+            x[i] = self._model.x(self._x[-1][i],
+                                 self._v[-1][i],
+                                 self._z[-1], svi)
 
-            v[i] = self._v[-1][i] + self._model.v(self._x[-1][i],
-                                                  self._v[-1][i],
-                                                  self._z[-1])
-            v[i] = 0.0 if v[i] < 0 else v[i]
+            v[i] = self._model.v(self._x[-1][i],
+                                 self._v[-1][i],
+                                 self._z[-1])
 
-        z = self._z[-1] + self._model.z(0, 0, self._z[-1], svi)
-        z = 0.0 if z < 0 else z
-
+        z = self._model.z(0, 0, self._z[-1], svi)
         t = self._t[-1] + self._step
 
         self._x = np.concatenate((self._x, [x]), axis=0)
